@@ -77,7 +77,7 @@ def merge_songs(sortedSongs):
 
         # check if speak exists, and if it does, add it to clips
         try:
-            speak_path = f"speaks/{head[1].replace(' ', '_')}_speak.wav"
+            speak_path = f"speaks/{head[1].replace(' ', '_')}.wav"
             curSpeak = AudioSegment.from_wav(speak_path)
             clips.append(curSpeak)
         except FileNotFoundError:
