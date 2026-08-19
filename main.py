@@ -8,7 +8,7 @@ from pydub import AudioSegment
 parser = argparse.ArgumentParser(description="A tool for creating klub100 tracks")
 parser.add_argument("filename", type=str, help="The path to the input file to be parsed")
 #optional fade argument with ms
-parser.add_argument("--fade", type=int, default=700, help="The fade in/out duration in milliseconds (default: 700ms)")
+parser.add_argument("--fade", type=int, default=500, help="The fade in/out duration in milliseconds (default: 500ms)")
 parser.add_argument("-o", type=str, default="klub100.wav", help="The output filename (default: klub100.wav)")
 args = parser.parse_args()
 if not args.filename:
@@ -88,7 +88,7 @@ def merge_songs(sortedSongs):
     for clip in clips:
         full_mix += clip
     print("Exporting final track to klub100.wav")
-    full_mix.export(args.out, format="wav")
+    full_mix.export(args.o, format="wav")
 
 
 try:
