@@ -8,7 +8,7 @@ from pydub import AudioSegment
 parser = argparse.ArgumentParser(description="A tool for creating klub100 tracks")
 parser.add_argument("filename", type=str, help="The path to the input file to be parsed")
 #optional fade argument with ms
-parser.add_argument("--fade", type=int, default=500, help="The fade in/out duration in milliseconds (default: 500ms)")
+parser.add_argument("--fade", type=int, default=800, help="The fade in/out duration in milliseconds (default: 800ms)")
 parser.add_argument("-o", type=str, default="klub100.wav", help="The output filename (default: klub100.wav)")
 args = parser.parse_args()
 if not args.filename:
@@ -64,16 +64,17 @@ def merge_songs(sortedSongs):
             print(f"Error: The file '{song_path}' does not exist. Skipping this song.")
             continue
 
-        print(f"Merging number '{head[0]}'; '{head[1]}' from {head[2]}...")
-        curSong = AudioSegment.from_wav(song_path)
-
         start = 0
         end = 1000 * 60
-        if head[3] != "" and head[4] != "":
+        if head[3] != "":
             start = 1000 * minsectosec(head[3])
+        if head[4] == "":
+            end = start+(1000*60)
+        else:
             end = 1000 * minsectosec(head[4])
 
-        clips.append(curSong[start:end].fade_in(args.fade).fade_out(args.fade))
+        print(f"Merging number '{head[0]}'; '{head[1]}' from {head[2]} ({start/1000}s - {end/1000}s)...")
+        curSong = AudioSegment.from_wav(song_path)
 
         # check if speak exists, and if it does, add it to clips
         try:
@@ -82,6 +83,9 @@ def merge_songs(sortedSongs):
             clips.append(curSpeak)
         except FileNotFoundError:
             print(f"Warning: The speak file '{speak_path}' does not exist. Skipping this speak.")
+
+        clips.append(curSong[start:end].fade_in(args.fade).fade_out(args.fade))
+
 
     full_mix = AudioSegment.empty()
     print("Merging all clips to single track")
