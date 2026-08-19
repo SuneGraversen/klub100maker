@@ -52,27 +52,30 @@ def minsectosec(minsec):
     return total_seconds
 
 def merge_songs(sortedSongs):
-    def inner(songs, acc):
-        if len(songs) == 0:
-            return acc
-        head = songs[0]
-        tail = songs[1:]
-        if not os.path.exists("songs/" + head[0] + ".wav"):
-            print(f"Error: The file 'songs/{head[0]}.wav' does not exist. Skipping this song.")
-            return inner(tail, acc)
-        print(f"Merging number '{head[0]}'; '{head[1]}' from {head[2]}...")
-        curSong = AudioSegment.from_wav("songs/" + head[0] + ".wav")
-        # convert start end to seconds
-        start = 0
-        end = 1000*60
-        if head[3] != "" and head[4] != "":
-            start = 1000*minsectosec(head[3])
-            end =   1000*minsectosec(head[4])
-        newAcc = acc + curSong[start:end]
-        del curSong
-        return inner(tail, newAcc)
+    clips = []
 
-    full_mix = inner(sortedSongs, AudioSegment.empty())
+    for head in sortedSongs:
+        song_path = f"songs/{head[0]}.wav"
+
+        if not os.path.exists(song_path):
+            print(f"Error: The file '{song_path}' does not exist. Skipping this song.")
+            continue
+
+        print(f"Merging number '{head[0]}'; '{head[1]}' from {head[2]}...")
+        curSong = AudioSegment.from_wav(song_path)
+
+        start = 0
+        end = 1000 * 60
+        if head[3] != "" and head[4] != "":
+            start = 1000 * minsectosec(head[3])
+            end = 1000 * minsectosec(head[4])
+
+        clips.append(curSong[start:end])
+
+    full_mix = AudioSegment.empty()
+    for clip in clips:
+        full_mix += clip
+
     full_mix.export("klub100.wav", format="wav")
 
 
