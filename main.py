@@ -23,8 +23,8 @@ def download_songs(sortedSongs):
         pass
     
     for song in sortedSongs:
-        curnum = song[0]
-        if os.path.exists(f"songs/{curnum}.wav"):
+        curname = song[1].replace(" ", "_")
+        if os.path.exists(f"songs/{curname}.wav"):
           print(f"Skipping number '{song[0]}'; '{song[1]}' from {song[2]} as it already exists...")
           continue  
 
@@ -34,7 +34,7 @@ def download_songs(sortedSongs):
             "cookiesfrombrowser": ("safari",),
             "remote_components": ["ejs:github"],
             "noplaylist": True,
-            "outtmpl": f"songs/{curnum}.%(ext)s",
+            "outtmpl": f"songs/{curname}.%(ext)s",
             "postprocessors": [{
             "key": "FFmpegExtractAudio",
             "preferredcodec": "wav",
@@ -58,7 +58,7 @@ def merge_songs(sortedSongs):
     clips = []
 
     for head in sortedSongs:
-        song_path = f"songs/{head[0]}.wav"
+        song_path = f"songs/{head[1].replace(' ', '_')}.wav"
 
         if not os.path.exists(song_path):
             print(f"Error: The file '{song_path}' does not exist. Skipping this song.")
@@ -77,7 +77,7 @@ def merge_songs(sortedSongs):
 
         # check if speak exists, and if it does, add it to clips
         try:
-            speak_path = f"speaks/{head[0]}_speak.wav"
+            speak_path = f"speaks/{head[1].replace(' ', '_')}_speak.wav"
             curSpeak = AudioSegment.from_wav(speak_path)
             clips.append(curSpeak)
         except FileNotFoundError:
