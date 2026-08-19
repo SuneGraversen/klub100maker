@@ -1,0 +1,5 @@
+audioop-lts==0.2.2
+deno==2.9.5
+ffmpeg==1.4
+pydub==0.25.1
+yt-dlp==2026.7.4
