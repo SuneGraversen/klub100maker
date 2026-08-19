@@ -10,6 +10,7 @@ parser.add_argument("filename", type=str, help="The path to the input file to be
 #optional fade argument with ms
 parser.add_argument("--fade", type=int, default=800, help="The fade in/out duration in milliseconds (default: 800ms)")
 parser.add_argument("-o", type=str, default="klub100.wav", help="The output filename (default: klub100.wav)")
+parser.add_argument("--dry-run", action="store_true", help="Perform a dry run without downloading or merging songs")
 args = parser.parse_args()
 if not args.filename:
     print("Error: No filename provided.")
@@ -54,6 +55,10 @@ def minsectosec(minsec):
     total_seconds = m * 60 + s
     return total_seconds
 
+def match_target_amplitude(sound, target_dBFS):
+    change_in_dBFS = target_dBFS - sound.dBFS
+    return sound + change_in_dBFS
+
 def merge_songs(sortedSongs):
     clips = []
 
@@ -86,14 +91,14 @@ def merge_songs(sortedSongs):
 
         clips.append(curSong[start:end].fade_in(args.fade).fade_out(args.fade))
 
-
+    clips = [match_target_amplitude(clip, -14.0) for clip in clips]
     full_mix = AudioSegment.empty()
-    print("Merging all clips to single track")
-    for clip in clips:
-        full_mix += clip
-    print("Exporting final track to klub100.wav")
-    full_mix.export(args.o, format="wav")
-
+    if not args.dry_run:
+        print("Merging all clips to single track")
+        for clip in clips:
+            full_mix += clip
+        print("Exporting final track to klub100.wav")
+        full_mix.export(args.o, bitrate="256k", format="wav")
 
 try:
     with open(args.filename, 'r') as file:
