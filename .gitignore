@@ -1,4 +1,5 @@
 klub100.wav
+*.wav
 songs/*
 speaks/*
 *.csv
